@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "quiz-seginfo",
+    "public": "build",
     "ignore": [
       "firebase.json",
       "**/.*",

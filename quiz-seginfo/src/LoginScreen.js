@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+// 1. ADICIONADO O 'Link' DO REACT ROUTER ELE QUE VAI FAZER A TROCA DE TELA
+import { Link } from 'react-router-dom';
 import { auth } from './firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-
-// --- Styled Components ---
 
 const Container = styled.div`
   display: flex;
@@ -61,7 +60,8 @@ const LinkWrapper = styled.div`
   margin-top: 20px;
 `;
 
-const StyledLink = styled.a`
+// 2. O STYLEDLINK AGORA APLICA ESTILOS AO COMPONENTE 'Link'
+const StyledLink = styled(Link)`
   color: #6a11cb;
   text-decoration: none;
   cursor: pointer;
@@ -71,27 +71,19 @@ const StyledLink = styled.a`
   }
 `;
 
-// --- Componente React ---
-
-const LoginScreen = ({ onNavigateToRegister }) => {
+// 3. REMOVIDA A PROP 'onNavigateToRegister'
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // 🔽 2. TRANSFORME A FUNÇÃO EM 'async'
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    // 🔽 3. USE O try/catch
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Login realizado com sucesso!", userCredential.user);
-      alert("Login bem-sucedido!");
-      // Aqui, você normalmente redirecionaria o usuário para a página principal do app
-      
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("Login realizado com sucesso!");
+      // O App.js cuidará do redirecionamento
     } catch (error) {
       console.error("Erro ao fazer login: ", error.message);
-      // Para erros de login, o Firebase costuma retornar 'auth/invalid-credential'
-      // para evitar que alguém descubra se um e-mail existe ou não.
       alert("E-mail ou senha inválidos. Verifique suas credenciais e tente novamente.");
     }
   };
@@ -101,7 +93,6 @@ const LoginScreen = ({ onNavigateToRegister }) => {
       <FormWrapper>
         <Title>Login</Title>
         <form onSubmit={handleLogin}>
-          {/* Inputs não mudam */}
           <Input
             type="email"
             placeholder="Seu e-mail"
@@ -120,7 +111,8 @@ const LoginScreen = ({ onNavigateToRegister }) => {
         </form>
         <LinkWrapper>
           Não tem uma conta?{' '}
-          <StyledLink onClick={onNavigateToRegister}>Cadastre-se</StyledLink>
+          {/* 4. AGORA USAMOS A PROP 'to' PARA DEFINIR A ROTA DE CADASTRO */}
+          <StyledLink to="/register">Cadastre-se</StyledLink>
         </LinkWrapper>
       </FormWrapper>
     </Container>

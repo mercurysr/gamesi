@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { auth } from './firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { db } from './firebase';
-import { doc, setDoc } from 'firebase/firestore';
+// 1. ADICIONADO O 'Link' DO REACT ROUTER ELE QUE VAI FAZER A TROCA DE TELA
+import { Link } from 'react-router-dom';
 
-// --- Styled Components (Reutilizando alguns do Login) ---
+// Imports do Firebase
+import { auth, db } from './firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 const Container = styled.div`
   display: flex;
@@ -63,7 +63,8 @@ const LinkWrapper = styled.div`
   margin-top: 20px;
 `;
 
-const StyledLink = styled.a`
+// 2. O STYLEDLINK AGORA APLICA ESTILOS AO COMPONENTE 'Link'
+const StyledLink = styled(Link)`
   color: #6a11cb;
   text-decoration: none;
   cursor: pointer;
@@ -73,32 +74,27 @@ const StyledLink = styled.a`
   }
 `;
 
-// --- Componente React ---
-
-const RegisterScreen = ({ onNavigateToLogin }) => {
+// 3. REMOVIDA A PROP 'onNavigateToLogin'
+const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // 🔽 2. TRANSFORME A FUNÇÃO EM 'async' PARA USAR O 'await'
   const handleRegister = async (e) => {
     e.preventDefault();
-
-    // 🔽 3. USE O try/catch PARA TRATAR SUCESSO E ERRO
     try {
-      // Cria o usuário no Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      
       await setDoc(doc(db, "users", user.uid), {
-      nome: name, // O 'name' vem do estado do seu componente
-    }, { merge: true }); // 'merge: true' garante que não vamos apagar os outros campos
+        nome: name,
+      }, { merge: true });
+
       console.log("Usuário cadastrado com sucesso!", userCredential.user);
       alert(`Conta para ${name} criada com sucesso!`);
-      // Aqui você pode redirecionar o usuário ou limpar o formulário
       
     } catch (error) {
       console.error("Erro ao cadastrar: ", error.message);
-      // Mostra um alerta amigável para o usuário
       if (error.code === 'auth/email-already-in-use') {
         alert("Este e-mail já está em uso. Tente outro.");
       } else if (error.code === 'auth/weak-password') {
@@ -114,7 +110,6 @@ const RegisterScreen = ({ onNavigateToLogin }) => {
       <FormWrapper>
         <Title>Crie sua Conta</Title>
         <form onSubmit={handleRegister}>
-          {/* Inputs não mudam */}
           <Input
             type="text"
             placeholder="Seu nome completo"
@@ -140,7 +135,8 @@ const RegisterScreen = ({ onNavigateToLogin }) => {
         </form>
         <LinkWrapper>
           Já tem uma conta?{' '}
-          <StyledLink onClick={onNavigateToLogin}>Faça Login</StyledLink>
+          {/* 4. AGORA USAMOS A PROP 'to' PARA DEFINIR A ROTA */}
+          <StyledLink to="/login">Faça Login</StyledLink>
         </LinkWrapper>
       </FormWrapper>
     </Container>
